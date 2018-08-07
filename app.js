@@ -245,6 +245,8 @@ function uploadTrack(article, hash) {
   });
 }
 
-app.listen(3005, () => {
-  console.log("App listening on port 3005!");
+var port = process.env.PORT || process.env.VCAP_APP_PORT || 3005;
+
+app.listen(port, function() {
+  console.log('Server running on port: %d', port);
 });
