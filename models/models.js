@@ -5,7 +5,7 @@ var ArticleSchema = new Schema({
     uid: String,
     headline: String,
     abstract: String,
-    author: String,
+    publisher: String,
     media: String,
     audioTrackID: String,
     publishedOn: Date
