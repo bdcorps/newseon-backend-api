@@ -231,7 +231,7 @@ function uploadTrack(article, hash) {
       uid: hash,
       headline: article.title,
       abstract: article.description,
-      author: article.source.name,
+      publisher: article.source.name,
       media: article.urlToImage,
       publishedOn: new Date(article.publishedAt),
       audioTrackID: id
