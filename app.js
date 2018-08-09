@@ -327,7 +327,7 @@ function uploadTrack(article, hash) {
       uid: hash,
       headline: article.title,
       abstract: article.description,
-      author: article.source.name,
+      publisher: article.source.name,
       media: article.urlToImage,
       publishedOn: new Date(article.publishedAt),
       audioTrackID: id
@@ -341,6 +341,8 @@ function uploadTrack(article, hash) {
   });
 }
 
-app.listen(3005, () => {
-  console.log("App listening on port 3005!");
+var port = process.env.PORT || process.env.VCAP_APP_PORT || 3005;
+
+app.listen(port, function() {
+  console.log('Server running on port: %d', port);
 });
