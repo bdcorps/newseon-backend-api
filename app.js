@@ -8,9 +8,12 @@ const multer = require("multer");
 var cookieParser = require("cookie-parser");
 let bodyParser = require("body-parser");
 var crypto = require("crypto");
+var path = require('path');
 
 var contentURLLists = require("./uploads/contentURLList");
 var sampleArticle = require("./uploads/sampleArticle");
+
+var categoriesJSON = require("./uploads/categoriesConfig");
 const trackRoute = express.Router();
 const { Readable } = require("stream");
 
@@ -20,9 +23,13 @@ const ObjectID = require("mongodb").ObjectID;
 
 var models = require("./models/models.js");
 var Article = models.ArticleModel;
+var Playlist = models.PlaylistModel;
+var Category = models.CategoryModel;
 
 // Imports the Google Cloud client library
 const textToSpeech = require("@google-cloud/text-to-speech");
+
+var currentPlaylistURLsToDownload = [];
 
 //var statusReport = {};
 
@@ -35,9 +42,10 @@ var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
 const HTTP_SERVER_ERROR = 500;
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   if (res.headersSent) {
     return next(err);
   }
@@ -80,8 +88,96 @@ mongoose.connect(
 // Creates a client
 const client = new textToSpeech.TextToSpeechClient();
 
-connection.once("open", function() {
+connection.once("open", function () {
   //  statusReport.articledb = {"status" :  "connected"}
+
+  app.get("/generate", (req, res) => {
+
+    categoriesAPI = [];
+    for (var i = 0; i < categoriesJSON.categories.length; i++) {
+      var categoriesData = {};
+      var category = categoriesJSON.categories[i];
+      categoriesData.id = category.id;
+      categoriesData.title = category.title;
+      categoriesData.playlists = convertQueryToPlaylistURLs(category.playlists, category.title);
+      categoriesAPI.push(categoriesData);
+    }
+
+
+    var categoryToSave = new Category({
+      categoriesAPI
+    });
+
+
+    categoryToSave.save(function (error) {
+      if (error) {
+        console.error(error);
+      }
+    });
+
+    res.send('Generated');
+  });
+
+
+  function convertQueryToPlaylistURLs(playlistQuery, title) {
+    var playlistIDs = [];
+    var title;
+    var urls = [];
+    var playlistsAPI = [];
+    for (var i = 0; i < playlistQuery.length; i++) {
+
+      var curPlaylist = playlistQuery[i];
+      var query = curPlaylist.query;
+
+      // This is only for topHeadlines. The everything and sources part have to be added.
+      if (curPlaylist.type == "topHeadlines") {
+        title = "Top Headlines"
+        let urlParameters = Object.entries(query).map(e => e.join('=')).join('&');
+        var playlistURL = "https://newsapi.org/v2/top-headlines?" +
+          urlParameters +
+          "&apiKey=" + API_KEY;
+
+        urls.push(playlistURL);
+      }
+
+      var random = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      var playlistsData = {};
+      playlistsData.id = random;
+      if (query.category != null) {
+        playlistsData.title = title + " about " + captilizeWord(query.category);
+      } else if (query.q != null) {
+        playlistsData.title = title + " about " + captilizeWord(query.q);
+      }
+      playlistsData.url = playlistURL;
+      playlistIDs.push(playlistsData.id);
+      //playlistsAPI.push(playlistsData);
+
+      //Put playlistsData to playlistdb
+
+
+      //TODO: need to add article IDS
+      var playlistToSave = new Playlist({
+        playlistData
+      });
+
+      playlistToSave.save(function (error) {
+        if (error) {
+          console.error(error);
+        }
+      });
+    }
+    //return playlists ids
+    return playlistIDs;
+  }
+
+  function captilizeWord(lower) {
+    return lower.charAt(0).toUpperCase() + lower.substr(1);
+  }
+
+
+  app.get("/", (req, res) => {
+    res.render('main.ejs');
+  });
 
   /**
    * GET /tracks/:trackID
@@ -237,7 +333,7 @@ function uploadTrack(article, hash) {
       audioTrackID: id
     });
 
-    articleToSave.save(function(error) {
+    articleToSave.save(function (error) {
       if (error) {
         console.error(error);
       }
