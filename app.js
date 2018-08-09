@@ -176,7 +176,7 @@ connection.once("open", function () {
 
 
   app.get("/", (req, res) => {
-    res.render('main.ejs');
+    res.send('its running');
   });
 
   /**
@@ -343,6 +343,6 @@ function uploadTrack(article, hash) {
 
 var port = process.env.PORT || process.env.VCAP_APP_PORT || 3005;
 
-app.listen(port, function() {
+app.listen(port, function () {
   console.log('Server running on port: %d', port);
 });
