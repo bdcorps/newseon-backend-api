@@ -8,7 +8,7 @@ const multer = require("multer");
 var cookieParser = require("cookie-parser");
 let bodyParser = require("body-parser");
 var crypto = require("crypto");
-var path = require('path');
+var path = require("path");
 
 var contentURLLists = require("./uploads/contentURLList");
 var sampleArticle = require("./uploads/sampleArticle");
@@ -31,6 +31,11 @@ const textToSpeech = require("@google-cloud/text-to-speech");
 
 var currentPlaylistURLsToDownload = [];
 
+//put the key in .env
+var config = require("./keys");
+var API_KEY = config.API_KEY;
+var dataToSaveToFile = { playlists: [] };
+
 //var statusReport = {};
 
 /* 
@@ -42,10 +47,10 @@ var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
 const HTTP_SERVER_ERROR = 500;
-app.use(function (err, req, res, next) {
+app.use(function(err, req, res, next) {
   if (res.headersSent) {
     return next(err);
   }
@@ -83,41 +88,44 @@ mongoose.connect(
   "mongodb://newseumapp1:newseumapp1@ds117336.mlab.com:17336/newseumapp"
 );
 
+mongoose.Promise = Promise;
+
 //----------------------google text to speech
 
 // Creates a client
 const client = new textToSpeech.TextToSpeechClient();
 
-connection.once("open", function () {
+connection.once("open", function() {
   //  statusReport.articledb = {"status" :  "connected"}
 
   app.get("/generate", (req, res) => {
-
     categoriesAPI = [];
     for (var i = 0; i < categoriesJSON.categories.length; i++) {
       var categoriesData = {};
       var category = categoriesJSON.categories[i];
       categoriesData.id = category.id;
       categoriesData.title = category.title;
-      categoriesData.playlists = convertQueryToPlaylistURLs(category.playlists, category.title);
+      categoriesData.playlists = convertQueryToPlaylistURLs(
+        category.playlists,
+        category.title
+      );
       categoriesAPI.push(categoriesData);
+
+      var categoryToSave = new Category({
+        id: categoriesData.id,
+        title: categoriesData.title,
+        playlists: categoriesData.playlists
+      });
+
+      categoryToSave.save(function(error) {
+        if (error) {
+          console.error(error);
+        }
+      });
     }
 
-
-    var categoryToSave = new Category({
-      categoriesAPI
-    });
-
-
-    categoryToSave.save(function (error) {
-      if (error) {
-        console.error(error);
-      }
-    });
-
-    res.send('Generated');
+    res.send("Generated");
   });
-
 
   function convertQueryToPlaylistURLs(playlistQuery, title) {
     var playlistIDs = [];
@@ -125,22 +133,32 @@ connection.once("open", function () {
     var urls = [];
     var playlistsAPI = [];
     for (var i = 0; i < playlistQuery.length; i++) {
-
       var curPlaylist = playlistQuery[i];
       var query = curPlaylist.query;
 
       // This is only for topHeadlines. The everything and sources part have to be added.
       if (curPlaylist.type == "topHeadlines") {
-        title = "Top Headlines"
-        let urlParameters = Object.entries(query).map(e => e.join('=')).join('&');
-        var playlistURL = "https://newsapi.org/v2/top-headlines?" +
+        title = "Top Headlines";
+        let urlParameters = Object.entries(query)
+          .map(e => e.join("="))
+          .join("&");
+        var playlistURL =
+          "https://newsapi.org/v2/top-headlines?" +
           urlParameters +
-          "&apiKey=" + API_KEY;
+          "&apiKey=" +
+          API_KEY;
 
         urls.push(playlistURL);
       }
 
-      var random = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      var random =
+        Math.random()
+          .toString(36)
+          .substring(2, 15) +
+        Math.random()
+          .toString(36)
+          .substring(2, 15);
+
       var playlistsData = {};
       playlistsData.id = random;
       if (query.category != null) {
@@ -149,18 +167,32 @@ connection.once("open", function () {
         playlistsData.title = title + " about " + captilizeWord(query.q);
       }
       playlistsData.url = playlistURL;
+      playlistsData.articles = [];
       playlistIDs.push(playlistsData.id);
+
+      dataToSaveToFile.playlists.push({
+        id: playlistsData.id,
+        url: playlistsData.url
+      });
+      saveToFile(dataToSaveToFile);
+
       //playlistsAPI.push(playlistsData);
 
       //Put playlistsData to playlistdb
 
+      console.log(">>>>>>>");
+      console.log(JSON.stringify(playlistsData));
+      console.log(">>>>>>>");
 
       //TODO: need to add article IDS
       var playlistToSave = new Playlist({
-        playlistData
+        id: playlistsData.id,
+        title: playlistsData.title,
+        url: playlistsData.url,
+        articles: playlistsData.articles
       });
 
-      playlistToSave.save(function (error) {
+      playlistToSave.save(function(error) {
         if (error) {
           console.error(error);
         }
@@ -170,13 +202,36 @@ connection.once("open", function () {
     return playlistIDs;
   }
 
+  function saveToFile(data) {
+    var dataToWrite = data;
+    var d = new Date();
+    var n = d.getTime();
+
+    dataToWrite.timestamp = n;
+    fs.writeFile(
+      __dirname + "/uploads/playlistsData",
+      JSON.stringify(data),
+      function(err) {
+        if (err) {
+          return console.log(err);
+        }
+
+        console.log("The file was saved!");
+      }
+    );
+  }
+
+  function readFromFile(path) {
+    var text = fs.readFileSync(path, "utf8");
+    return JSON.parse(text);
+  }
+
   function captilizeWord(lower) {
     return lower.charAt(0).toUpperCase() + lower.substr(1);
   }
 
-
   app.get("/", (req, res) => {
-    res.send('its running');
+    res.send("its running");
   });
 
   /**
@@ -218,21 +273,66 @@ connection.once("open", function () {
    */
 
   app.post("/tracks/", (req, res) => {
-    var playlists = contentURLLists.playlists;
+    //read playlistsData file
+
+    var data = readFromFile(__dirname + "/uploads/playlistsData");
+    var playlists = data.playlists;
+
+    var articleIDs = [];
 
     //Calls the newsapi.org for articles based on the contentURLList.js
-    var articles = sampleArticle.content.articles;
 
-    for (var i = 0; i < playlists.length; i++) {
-      //   request(playlists[i], function(error, response, body) {
-      //     if (!error && response.statusCode == 200) {
-      //       console.log(body);
-      //     }
-      //   });
+    console.log("+++");
 
-      for (var j = 0; j < articles.length; j++) {
-        initAudioTracks(req, res, articles[j]);
-      }
+    console.log(playlists.length);
+    console.log("+++");
+
+    for (let i = 0; i < playlists.length; i++) {
+      request(playlists[i].url, function(error, response, body) {
+        if (!error && response.statusCode == 200) {
+          articles = body;
+
+          console.log(
+            "-----------------------------------------------------------"
+          );
+          console.log(articles);
+          console.log(
+            "-----------------------------------------------------------"
+          );
+
+          var articles = sampleArticle.content.articles;
+          articleIDs = [];
+          // Create a hash based on the contents of the article title
+          // This is so we don't write duplicate content to the db
+          var hash = "";
+          for (var j = 0; j < articles.length; j++) {
+            hash = crypto
+              .createHash("md5")
+              .update(articles[j].title)
+              .digest("hex");
+
+            initAudioTracks(req, res, articles[j], hash);
+            articleIDs.push(hash);
+
+            // articleIDs.push());
+          }
+
+          // console.log("about to wrtie to " + i + " " + playlists[i]);
+
+          //save articleIDs to playlistdb docs
+          Playlist.findOne({ id: playlists[i].id }, function(err, doc) {
+            doc.articles = articleIDs;
+            console.log("MMMM");
+            console.log(articleIDs);
+            console.log("MMMM");
+            doc.save(function(err) {
+              if (err) {
+                console.error("ERROR!" + err);
+              }
+            });
+          });
+        }
+      });
     }
 
     return res.status(201).json({
@@ -244,12 +344,18 @@ connection.once("open", function () {
 const snooze = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 // Slowing down the calls to Google Text to Speech
-const initAudioTracks = async (req, res, article) => {
+const initAudioTracks = async (req, res, article, hash) => {
   await snooze(2000);
-  generateAudioTrack(req, res, article);
+  generateAudioTrack(req, res, article, hash);
 };
 
-function generateAudioTrack(req, res, article) {
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage: storage,
+  limits: { fields: 1, fileSize: 6000000, files: 1, parts: 2 }
+});
+
+function generateAudioTrack(req, res, article, hash) {
   const audioRequest = {
     input: { text: article.title },
     // Select the language and SSML Voice Gender (optional)
@@ -268,13 +374,6 @@ function generateAudioTrack(req, res, article) {
 
     //  statusReport.speech = {tts: "connected"};
 
-    // Create a hash based on the contents of the article title
-    // This is so we don't write duplicate content to the db
-    var hash = crypto
-      .createHash("md5")
-      .update(article.title)
-      .digest("hex");
-
     // Write the binary audio content to a local file
     fs.writeFile(
       __dirname + "/uploads/" + hash,
@@ -287,16 +386,14 @@ function generateAudioTrack(req, res, article) {
         }
 
         //When done saving file
-        const storage = multer.memoryStorage();
-        const upload = multer({
-          storage: storage,
-          limits: { fields: 1, fileSize: 6000000, files: 1, parts: 2 }
-        });
+
         upload.single("track")(req, res, err => {
           if (err) {
             console.log("error: " + err);
           }
-          uploadTrack(article, hash);
+
+         uploadTrack(article, hash);
+        
         });
       }
     );
@@ -333,7 +430,7 @@ function uploadTrack(article, hash) {
       audioTrackID: id
     });
 
-    articleToSave.save(function (error) {
+    articleToSave.save(function(error) {
       if (error) {
         console.error(error);
       }
@@ -343,6 +440,6 @@ function uploadTrack(article, hash) {
 
 var port = process.env.PORT || process.env.VCAP_APP_PORT || 3005;
 
-app.listen(port, function () {
-  console.log('Server running on port: %d', port);
+app.listen(port, function() {
+  console.log("Server running on port: %d", port);
 });
