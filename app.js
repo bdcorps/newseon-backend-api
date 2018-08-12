@@ -135,7 +135,7 @@ connection.once("open", function() {
     });
   });
 
-  app.get("/generate", (req, res) => {
+  app.post("/generate", (req, res) => {
     categoriesAPI = [];
     for (var i = 0; i < categoriesJSON.categories.length; i++) {
       var categoriesData = {};
