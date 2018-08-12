@@ -10,6 +10,8 @@ let bodyParser = require("body-parser");
 var crypto = require("crypto");
 var path = require("path");
 
+require('dotenv').config();
+
 var contentURLLists = require("./uploads/contentURLList");
 var sampleArticle = require("./uploads/sampleArticle");
 
@@ -32,8 +34,7 @@ const textToSpeech = require("@google-cloud/text-to-speech");
 var currentPlaylistURLsToDownload = [];
 
 //put the key in .env
-var config = require("./keys");
-var API_KEY = config.API_KEY;
+var API_KEY = process.env.API_KEY;
 var dataToSaveToFile = { playlists: [] };
 
 //var statusReport = {};
