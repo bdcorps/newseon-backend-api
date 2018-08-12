@@ -10,7 +10,7 @@ let bodyParser = require("body-parser");
 var crypto = require("crypto");
 var path = require("path");
 
-require('dotenv').config();
+require("dotenv").config();
 
 var contentURLLists = require("./uploads/contentURLList");
 var sampleArticle = require("./uploads/sampleArticle");
@@ -98,6 +98,42 @@ const client = new textToSpeech.TextToSpeechClient();
 
 connection.once("open", function() {
   //  statusReport.articledb = {"status" :  "connected"}
+
+  app.get("/categories", (req, res) => {
+    Category.find({}, function(err, doc) {
+      if (err) {
+        res.send("error: " + err);
+      }
+      res.send(doc);
+    });
+  });
+
+  app.get("/categories/:categoryID", (req, res) => {
+    Category.find({id:req.params.categoryID}, function(err, doc) {
+      if (err) {
+        res.send("error: " + err);
+      }
+      res.send(doc);
+    });
+  });
+
+  app.get("/playlists/:playlistID", (req, res) => {
+    Playlist.find({id:req.params.playlistID}, function(err, doc) {
+      if (err) {
+        res.send("error: " + err);
+      }
+      res.send(doc);
+    });
+  });
+
+  app.get("/articles/:articleID", (req, res) => {
+    Article.find({uid:req.params.articleID}, function(err, doc) {
+      if (err) {
+        res.send("error: " + err);
+      }
+      res.send(doc);
+    });
+  });
 
   app.get("/generate", (req, res) => {
     categoriesAPI = [];
@@ -393,8 +429,7 @@ function generateAudioTrack(req, res, article, hash) {
             console.log("error: " + err);
           }
 
-         uploadTrack(article, hash);
-        
+          uploadTrack(article, hash);
         });
       }
     );

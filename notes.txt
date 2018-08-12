@@ -1,0 +1,8 @@
++ currently only support for "topheadlines". "trending" and "sources" need to be added.
++ no error handling as of yet.
++ no log report generation.
++ usage:
+    + update categoriesConfig.js with new category information.
+    + run GET on /generate to generate the playlists and write to /uploads/playlistsData. CategoriesDB and PlaylistsDB will be updated. Playlists' articles array will be empty.
+    + run POST on /tracks to generate article audios and update PlaylistsDB and ArticlesDB.
+    + run GET on /categories/:categoryID, /playlists/:playlistID and /articles/:articleID.
