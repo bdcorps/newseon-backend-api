@@ -50,7 +50,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
-app.use(cors({credentials: true, origin: true}));
+app.use(cors());
 
 // Add headers
 app.use(function (req, res, next) {
