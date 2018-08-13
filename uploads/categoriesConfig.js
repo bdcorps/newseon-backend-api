@@ -11,10 +11,22 @@ var categoriesJSON = {
             }
         }
         ]
+    },
+    {
+        id: "topheadlines2",
+        title: "Top Headlines",
+        playlists: [{
+            type: "topHeadlines",
+            query: {
+                q: 'trump',
+                language: 'en',
+                'pageSize': 10
+            }
+        }
+        ]
     }
     ]
 }
-
 
 module.exports = categoriesJSON;
 
