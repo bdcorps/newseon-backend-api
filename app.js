@@ -9,6 +9,7 @@ var cookieParser = require("cookie-parser");
 let bodyParser = require("body-parser");
 var crypto = require("crypto");
 var path = require("path");
+var cors = require('cors');
 
 require("dotenv").config();
 
@@ -49,6 +50,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+app.use(cors({credentials: true, origin: true}));
 
 const HTTP_SERVER_ERROR = 500;
 app.use(function(err, req, res, next) {
