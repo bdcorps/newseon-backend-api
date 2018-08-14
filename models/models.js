@@ -15,6 +15,7 @@ var PlaylistSchema = new Schema({
     id: String,
     title: String,
     url: String,
+    media: String,
     articles: [String]
 });
 
