@@ -22,7 +22,7 @@ var PlaylistSchema = new Schema({
 var CategorySchema = new Schema({
     id: String,
     title: String,
-    playlists: [String]
+    playlists: [Schema.Types.Mixed]
 });
 
 
