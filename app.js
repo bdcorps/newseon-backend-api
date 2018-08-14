@@ -126,7 +126,7 @@ connection.once("open", function() {
       if (err) {
         res.send("error: " + err);
       }
-      res.send(doc);
+      res.send({category: doc});
     });
   });
 
