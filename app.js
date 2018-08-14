@@ -226,6 +226,7 @@ connection.once("open", function() {
         playlistsData.title = title + " about " + captilizeWord(query.q);
       }
       playlistsData.url = playlistURL;
+      playlistsData.media = "http://via.placeholder.com/150x150";
       playlistsData.articles = [];
       playlistIDs.push({playlistsData.id, playlistsData.title, playlistsData.media});
 
@@ -248,7 +249,7 @@ connection.once("open", function() {
         id: playlistsData.id,
         title: playlistsData.title,
         url: playlistsData.url,
-        media: "http://via.placeholder.com/150x150",
+        media: playlistsData.media,
         articles: playlistsData.articles
       });
 
