@@ -228,7 +228,7 @@ connection.once("open", function() {
       playlistsData.url = playlistURL;
       playlistsData.media = "http://via.placeholder.com/150x150";
       playlistsData.articles = [];
-      playlistIDs.push({playlistsData.id, playlistsData.title, playlistsData.media});
+      playlistIDs.push({id: playlistsData.id, title: playlistsData.title, media: playlistsData.media});
 
       dataToSaveToFile.playlists.push({
         id: playlistsData.id,
