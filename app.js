@@ -144,7 +144,20 @@ connection.once("open", function() {
       if (err) {
         res.send("error: " + err);
       }
-      res.send(doc);
+      var resultingDoc = doc;
+      resultingDoc.articles=[];
+      for (let i=0; doc.articles.length;i++)
+      {
+        let article = doc.articles[i];
+      Article.find({uid:article}, function(err, doc) {
+      if (err) {
+        res.send("error: " + err);
+      }
+        resultingDoc.push (doc);
+     
+    });
+      }
+      res.send(resultingDoc);
     });
   });
 
@@ -373,6 +386,8 @@ connection.once("open", function() {
               .digest("hex");
 
             initAudioTracks(req, res, articles[j], hash);
+            
+            
             articleIDs.push(hash);
 
             // articleIDs.push());
@@ -383,9 +398,7 @@ connection.once("open", function() {
           //save articleIDs to playlistdb docs
           Playlist.findOne({ id: playlists[i].id }, function(err, doc) {
             doc.articles = articleIDs;
-            console.log("MMMM");
             console.log(articleIDs);
-            console.log("MMMM");
             doc.save(function(err) {
               if (err) {
                 console.error("ERROR!" + err);
