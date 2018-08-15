@@ -305,7 +305,7 @@ connection.once("open", function() {
   }
 
   app.get("/", (req, res) => {
-    res.send("its running");
+    res.send("its running 0.1");
   });
 
   /**
