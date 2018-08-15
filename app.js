@@ -153,9 +153,11 @@ connection.once("open", function() {
       if (err) {
         res.send("error: " + err);
       }
-        resultingDoc.push (doc);
+        
      
-    });
+    }) .exec(function(error, doc) {resultingDoc.push (doc);
+                console.log(JSON.stringify(posts, null, "\t"));
+            });
       }
       res.send(resultingDoc);
     });
