@@ -9,7 +9,7 @@ var cookieParser = require("cookie-parser");
 let bodyParser = require("body-parser");
 var crypto = require("crypto");
 var path = require("path");
-var cors = require('cors');
+var cors = require("cors");
 
 require("dotenv").config();
 
@@ -53,20 +53,25 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cors());
 
 // Add headers
-app.use(function (req, res, next) {
-
+app.use(function(req, res, next) {
   // Website you wish to allow to connect
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader("Access-Control-Allow-Origin", "*");
 
   // Request methods you wish to allow
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+  );
 
   // Request headers you wish to allow
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-Requested-With,content-type"
+  );
 
   // Set to true if you need the website to include cookies in the requests sent
   // to the API (e.g. in case you use sessions)
-  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader("Access-Control-Allow-Credentials", true);
 
   // Pass to next layer of middleware
   next();
@@ -126,12 +131,12 @@ connection.once("open", function() {
       if (err) {
         res.send("error: " + err);
       }
-      res.send({category: doc});
+      res.send({ category: doc });
     });
   });
 
   app.get("/categories/:categoryID", (req, res) => {
-    Category.find({id:req.params.categoryID}, function(err, doc) {
+    Category.find({ id: req.params.categoryID }, function(err, doc) {
       if (err) {
         res.send("error: " + err);
       }
@@ -140,31 +145,37 @@ connection.once("open", function() {
   });
 
   app.get("/playlists/:playlistID", (req, res) => {
-    Playlist.find({id:req.params.playlistID}, function(err, doc) {
+    // Playlist.find({id:req.params.playlistID}, function(err, doc) {
+    //   if (err) {
+    //     res.send("error: " + err);
+    //   }
+    //   var resultingDoc = doc;
+    //   resultingDoc.articles=[];
+    //   for (let i=0; doc.articles.length;i++)
+    //   {
+    //     let article = doc.articles[i];
+    //   Article.find({uid:article}, function(err, doc) {
+    //   if (err) {
+    //     res.send("error: " + err);
+    //   }
+
+    // }) .exec(function(error, doc) {resultingDoc.push (doc);
+    //             console.log(JSON.stringify(posts, null, "\t"));
+    //         });
+    //   }
+    //   res.send(resultingDoc);
+    // });
+
+    Playlist.find({ id: req.params.playlistID }, function(err, doc) {
       if (err) {
         res.send("error: " + err);
       }
-      var resultingDoc = doc;
-      resultingDoc.articles=[];
-      for (let i=0; doc.articles.length;i++)
-      {
-        let article = doc.articles[i];
-      Article.find({uid:article}, function(err, doc) {
-      if (err) {
-        res.send("error: " + err);
-      }
-        
-     
-    }) .exec(function(error, doc) {resultingDoc.push (doc);
-                console.log(JSON.stringify(posts, null, "\t"));
-            });
-      }
-      res.send(resultingDoc);
+      res.send(doc);
     });
   });
 
   app.get("/articles/:articleID", (req, res) => {
-    Article.find({uid:req.params.articleID}, function(err, doc) {
+    Article.find({ uid: req.params.articleID }, function(err, doc) {
       if (err) {
         res.send("error: " + err);
       }
@@ -243,7 +254,11 @@ connection.once("open", function() {
       playlistsData.url = playlistURL;
       playlistsData.media = "http://via.placeholder.com/150x150";
       playlistsData.articles = [];
-      playlistIDs.push({id: playlistsData.id, title: playlistsData.title, media: playlistsData.media});
+      playlistIDs.push({
+        id: playlistsData.id,
+        title: playlistsData.title,
+        media: playlistsData.media
+      });
 
       dataToSaveToFile.playlists.push({
         id: playlistsData.id,
@@ -255,11 +270,7 @@ connection.once("open", function() {
 
       //Put playlistsData to playlistdb
 
-      console.log(">>>>>>>");
-      console.log(JSON.stringify(playlistsData));
-      console.log(">>>>>>>");
-
-      //TODO: need to add article IDS
+      //TODO: need to add actual articles
       var playlistToSave = new Playlist({
         id: playlistsData.id,
         title: playlistsData.title,
@@ -307,7 +318,7 @@ connection.once("open", function() {
   }
 
   app.get("/", (req, res) => {
-    res.send("its running 0.1");
+    res.send("API Version 0.2");
   });
 
   /**
@@ -358,23 +369,10 @@ connection.once("open", function() {
 
     //Calls the newsapi.org for articles based on the contentURLList.js
 
-    console.log("+++");
-
-    console.log(playlists.length);
-    console.log("+++");
-
     for (let i = 0; i < playlists.length; i++) {
       request(playlists[i].url, function(error, response, body) {
         if (!error && response.statusCode == 200) {
           articles = body;
-
-          console.log(
-            "-----------------------------------------------------------"
-          );
-          console.log(articles);
-          console.log(
-            "-----------------------------------------------------------"
-          );
 
           var articles = sampleArticle.content.articles;
           articleIDs = [];
@@ -387,26 +385,12 @@ connection.once("open", function() {
               .update(articles[j].title)
               .digest("hex");
 
-            initAudioTracks(req, res, articles[j], hash);
-            
-            
+            initAudioTracks(req, res, articles[j], hash, playlists[i].id);
+
             articleIDs.push(hash);
 
             // articleIDs.push());
           }
-
-          // console.log("about to wrtie to " + i + " " + playlists[i]);
-
-          //save articleIDs to playlistdb docs
-          Playlist.findOne({ id: playlists[i].id }, function(err, doc) {
-            doc.articles = articleIDs;
-            console.log(articleIDs);
-            doc.save(function(err) {
-              if (err) {
-                console.error("ERROR!" + err);
-              }
-            });
-          });
         }
       });
     }
@@ -420,9 +404,9 @@ connection.once("open", function() {
 const snooze = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 // Slowing down the calls to Google Text to Speech
-const initAudioTracks = async (req, res, article, hash) => {
+const initAudioTracks = async (req, res, article, hash, playlistID) => {
   await snooze(2000);
-  generateAudioTrack(req, res, article, hash);
+  generateAudioTrack(req, res, article, hash, playlistID);
 };
 
 const storage = multer.memoryStorage();
@@ -431,7 +415,7 @@ const upload = multer({
   limits: { fields: 1, fileSize: 6000000, files: 1, parts: 2 }
 });
 
-function generateAudioTrack(req, res, article, hash) {
+function generateAudioTrack(req, res, article, hash, playlistID) {
   const audioRequest = {
     input: { text: article.title },
     // Select the language and SSML Voice Gender (optional)
@@ -467,8 +451,7 @@ function generateAudioTrack(req, res, article, hash) {
           if (err) {
             console.log("error: " + err);
           }
-
-          uploadTrack(article, hash);
+          uploadTrack(article, hash, playlistID);
         });
       }
     );
@@ -476,7 +459,7 @@ function generateAudioTrack(req, res, article, hash) {
 }
 
 // Uploads the audio track of the news article to db
-function uploadTrack(article, hash) {
+function uploadTrack(article, hash, playlistID) {
   var readableTrackStream = fs.createReadStream(__dirname + "/uploads/" + hash);
 
   let bucket = new mongodb.GridFSBucket(db, {
@@ -490,12 +473,11 @@ function uploadTrack(article, hash) {
   readableTrackStream.pipe(uploadStream);
 
   uploadStream.on("error", () => {
-    // return res.status(500).json({ message: "Error uploading file" });
+    return res.status(500).json({ message: "Error uploading file" });
   });
 
   uploadStream.on("finish", () => {
-    //save to mongodb
-    var articleToSave = new Article({
+    var articleObject = {
       uid: hash,
       headline: article.title,
       abstract: article.description,
@@ -503,12 +485,25 @@ function uploadTrack(article, hash) {
       media: article.urlToImage,
       publishedOn: new Date(article.publishedAt),
       audioTrackID: id
-    });
+    };
+
+    //save to mongodb
+    var articleToSave = new Article(articleObject);
 
     articleToSave.save(function(error) {
       if (error) {
         console.error(error);
       }
+
+      //save articleIDs to playlistdb docs
+      Playlist.findOne({ id: playlistID }, function(err, doc) {
+        doc.articles.push(articleObject);
+        doc.save(function(err) {
+          if (err) {
+            console.error("ERROR!" + err);
+          }
+        });
+      });
     });
   });
 }
