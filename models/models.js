@@ -3,6 +3,7 @@ var Schema = mongoose.Schema;
 
 var ArticleSchema = new Schema({
     uid: String,
+    order: Number,
     headline: String,
     abstract: String,
     publisher: String,
