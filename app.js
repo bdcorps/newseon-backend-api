@@ -183,6 +183,10 @@ connection.once("open", function() {
     });
   });
 
+  /*
+  * 
+  * 
+  */
   app.post("/generate", (req, res) => {
     categoriesAPI = [];
     for (var i = 0; i < categoriesJSON.categories.length; i++) {
@@ -385,7 +389,7 @@ connection.once("open", function() {
               .update(articles[j].title)
               .digest("hex");
 
-            initAudioTracks(req, res, articles[j], hash, playlists[i].id);
+            initAudioTracks(req, res, articles[j], hash, playlists[i].id,j);
 
             articleIDs.push(hash);
 
@@ -404,9 +408,9 @@ connection.once("open", function() {
 const snooze = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 // Slowing down the calls to Google Text to Speech
-const initAudioTracks = async (req, res, article, hash, playlistID) => {
+const initAudioTracks = async (req, res, article, hash, playlistID, articleOrder) => {
   await snooze(2000);
-  generateAudioTrack(req, res, article, hash, playlistID);
+  generateAudioTrack(req, res, article, hash, playlistID, articleOrder);
 };
 
 const storage = multer.memoryStorage();
@@ -415,7 +419,7 @@ const upload = multer({
   limits: { fields: 1, fileSize: 6000000, files: 1, parts: 2 }
 });
 
-function generateAudioTrack(req, res, article, hash, playlistID) {
+function generateAudioTrack(req, res, article, hash, playlistID, articleOrder) {
   const audioRequest = {
     input: { text: article.title },
     // Select the language and SSML Voice Gender (optional)
@@ -451,7 +455,7 @@ function generateAudioTrack(req, res, article, hash, playlistID) {
           if (err) {
             console.log("error: " + err);
           }
-          uploadTrack(article, hash, playlistID);
+          uploadTrack(article, hash, playlistID, articleOrder);
         });
       }
     );
@@ -459,7 +463,7 @@ function generateAudioTrack(req, res, article, hash, playlistID) {
 }
 
 // Uploads the audio track of the news article to db
-function uploadTrack(article, hash, playlistID) {
+function uploadTrack(article, hash, playlistID, articleOrder) {
   var readableTrackStream = fs.createReadStream(__dirname + "/uploads/" + hash);
 
   let bucket = new mongodb.GridFSBucket(db, {
@@ -479,6 +483,7 @@ function uploadTrack(article, hash, playlistID) {
   uploadStream.on("finish", () => {
     var articleObject = {
       uid: hash,
+      order: articleOrder,
       headline: article.title,
       abstract: article.description,
       publisher: article.source.name,
