@@ -131,7 +131,7 @@ connection.once("open", function() {
       if (err) {
         res.send("error: " + err);
       }
-      res.send({ category: doc });
+      res.send({ category: doc[0] });
     });
   });
 
@@ -140,7 +140,7 @@ connection.once("open", function() {
       if (err) {
         res.send("error: " + err);
       }
-      res.send(doc);
+      res.send(doc[0]);
     });
   });
 
@@ -170,7 +170,7 @@ connection.once("open", function() {
       if (err) {
         res.send("error: " + err);
       }
-      res.send(doc);
+      res.send(doc[0]);
     });
   });
 
@@ -179,7 +179,7 @@ connection.once("open", function() {
       if (err) {
         res.send("error: " + err);
       }
-      res.send(doc);
+      res.send(doc[0]);
     });
   });
 
