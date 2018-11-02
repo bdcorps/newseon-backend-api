@@ -433,7 +433,7 @@ const upload = multer({
 
 function generateAudioTrack(req, res, article, hash, playlistID, articleOrder) {
   const audioRequest = {
-    input: { text: article.abstract },
+    input: { text: article.description !=null ? article.description : article.title },
     // Select the language and SSML Voice Gender (optional)
     voice: { languageCode: "en-US", ssmlGender: "NEUTRAL" },
     // Select the type of audio encoding
