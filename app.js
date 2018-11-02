@@ -13,10 +13,11 @@ var cors = require("cors");
 
 require("dotenv").config();
 
-var contentURLLists = require("./uploads/contentURLList");
-var sampleArticle = require("./uploads/sampleArticle");
+var contentURLLists = require("./public/contentURLList");
+var sampleArticle = require("./public/sampleArticle");
 
-var categoriesJSON = require("./uploads/categoriesConfig");
+var categoriesJSON = require("./public/categoriesConfig");
+var playlistImagesSources = require("./public/playlistImageSources");
 const trackRoute = express.Router();
 const { Readable } = require("stream");
 
@@ -238,6 +239,18 @@ connection.once("open", function() {
           API_KEY;
 
         urls.push(playlistURL);
+      }else if (curPlaylist.type == "dailyNews"){
+        title = "Daily News";
+        let urlParameters = Object.entries(query)
+          .map(e => e.join("="))
+          .join("&");
+        var playlistURL =
+          "https://newsapi.org/v2/everything?" +
+          urlParameters +
+          "&apiKey=" +
+          API_KEY;
+
+        urls.push(playlistURL);
       }
 
       var random =
@@ -256,7 +269,7 @@ connection.once("open", function() {
         playlistsData.title = title + " about " + captilizeWord(query.q);
       }
       playlistsData.url = playlistURL;
-      playlistsData.media = "http://via.placeholder.com/150x150";
+      playlistsData.media = playlistImagesSources.getMedia();
       playlistsData.articles = [];
       playlistIDs.push({
         id: playlistsData.id,
@@ -300,7 +313,7 @@ connection.once("open", function() {
 
     dataToWrite.timestamp = n;
     fs.writeFile(
-      __dirname + "/uploads/playlistsData",
+      __dirname + "/public/playlistsData",
       JSON.stringify(data),
       function(err) {
         if (err) {
@@ -366,7 +379,7 @@ connection.once("open", function() {
   app.post("/tracks/", (req, res) => {
     //read playlistsData file
 
-    var data = readFromFile(__dirname + "/uploads/playlistsData");
+    var data = readFromFile(__dirname + "/public/playlistsData");
     var playlists = data.playlists;
 
     var articleIDs = [];
@@ -376,9 +389,8 @@ connection.once("open", function() {
     for (let i = 0; i < playlists.length; i++) {
       request(playlists[i].url, function(error, response, body) {
         if (!error && response.statusCode == 200) {
-          articles = body;
-
-          var articles = sampleArticle.content.articles;
+          articles = JSON.parse(body).articles;
+          // var articles = sampleArticle.content.articles;
           articleIDs = [];
           // Create a hash based on the contents of the article title
           // This is so we don't write duplicate content to the db
@@ -485,11 +497,14 @@ function uploadTrack(article, hash, playlistID, articleOrder) {
       uid: hash,
       order: articleOrder,
       headline: article.title,
-      abstract: article.description,
+      // abstract: article.description,
+      abstract: (article.description != null) ? article.description : article.title, 
       publisher: article.source.name,
-      media: article.urlToImage,
+      // media: article.urlToImage,
+      media: (article.urlToImage != null) ? article.urlToImage  : "https://via.placeholder.com/350x350",
       publishedOn: new Date(article.publishedAt),
-      audioTrackID: id
+      audioTrackID: id,
+      url: article.url
     };
 
     //save to mongodb
@@ -502,12 +517,13 @@ function uploadTrack(article, hash, playlistID, articleOrder) {
 
       //save articleIDs to playlistdb docs
       Playlist.findOne({ id: playlistID }, function(err, doc) {
+        if (doc != null){
         doc.articles.push(articleObject);
         doc.save(function(err) {
           if (err) {
-            console.error("ERROR!" + err);
+            console.error("ERROR! Playlist ID is "+ id + " " + err);
           }
-        });
+        });}
       });
     });
   });
