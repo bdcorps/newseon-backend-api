@@ -1,32 +1,39 @@
 var categoriesJSON = {
-    categories: [{
-        id: "topheadlines",
-        title: "Top Headlines",
-        playlists: [{
-            type: "topHeadlines",
-            query: {
-                q: 'bitcoin',
-                language: 'en',
-                'pageSize': 10
-            }
-        }
-        ]
-    },
+  categories: [
     {
-        id: "topheadlines2",
-        title: "Top Headlines",
-        playlists: [{
-            type: "topHeadlines",
-            query: {
-                q: 'trump',
-                language: 'en',
-                'pageSize': 10
-            }
+      id: "topheadlines",
+      title: "Top Headlines",
+      playlists: [
+        {
+          type: "topHeadlines",
+          query: {
+            category: "business",
+            country: "us",
+            pageSize: 10
+          }
+        },
+        {
+          type: "dailyNews",
+          query: {
+            q: "technology",
+            language: "en",
+            sortBy: "popularity",
+            pageSize: 10
+          }
+        },
+        {
+          type: "dailyNews",
+          query: {
+            q: "sports",
+            language: "en",
+            sortBy: "popularity",
+            pageSize: 10
+          }
         }
-        ]
+      ]
     }
-    ]
-}
+  ]
+};
 
 module.exports = categoriesJSON;
 
@@ -77,6 +84,5 @@ module.exports = categoriesJSON;
 
 //     ]
 // }
-
 
 // module.exports = categoriesJSON;
