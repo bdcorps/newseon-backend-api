@@ -252,7 +252,7 @@ connection.once("open", function() {
 
         urls.push(playlistURL);
       }
-      else if (curPlaylist.type == "souurces"){
+      else if (curPlaylist.type == "sources"){
         title = "Daily News";
         let urlParameters = Object.entries(query)
           .map(e => e.join("="))
