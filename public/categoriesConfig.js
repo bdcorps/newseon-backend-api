@@ -22,25 +22,25 @@ var categoriesJSON = {
           }
         },
         {
-          type: "sources",
+          type: "dailyNews",
           query: {
-            category: "sports",
+            q: "sports",
             language: "en",
             pageSize: 10
           }
         },
         {
-          type: "sources",
+          type: "dailyNews",
           query: {
-            category: "health",
+            q: "health",
             language: "en",
             pageSize: 10
           }
         },
         {
-          type: "sources",
+          type: "dailyNews",
           query: {
-            category: "entertainment",
+            q: "entertainment",
             language: "en",
             pageSize: 10
           }
