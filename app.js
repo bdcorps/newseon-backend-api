@@ -252,7 +252,19 @@ connection.once("open", function() {
 
         urls.push(playlistURL);
       }
+      else if (curPlaylist.type == "souurces"){
+        title = "Daily News";
+        let urlParameters = Object.entries(query)
+          .map(e => e.join("="))
+          .join("&");
+        var playlistURL =
+          "https://newsapi.org/v2/sources?" +
+          urlParameters +
+          "&apiKey=" +
+          API_KEY;
 
+        urls.push(playlistURL);
+      }
       var random =
         Math.random()
           .toString(36)
