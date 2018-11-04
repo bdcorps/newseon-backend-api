@@ -22,11 +22,26 @@ var categoriesJSON = {
           }
         },
         {
-          type: "dailyNews",
+          type: "sources",
           query: {
-            q: "sports",
+            category: "sports",
             language: "en",
-            sortBy: "popularity",
+            pageSize: 10
+          }
+        },
+        {
+          type: "sources",
+          query: {
+            category: "health",
+            language: "en",
+            pageSize: 10
+          }
+        },
+        {
+          type: "sources",
+          query: {
+            category: "entertainment",
+            language: "en",
             pageSize: 10
           }
         }
