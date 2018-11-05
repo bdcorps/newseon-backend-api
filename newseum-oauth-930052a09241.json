@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "newseum-oauth",
+  "private_key_id": "930052a0924101ba9bbaa83256fb93cfab6e649b",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEuwIBADANBgkqhkiG9w0BAQEFAASCBKUwggShAgEAAoIBAQCvlIn9apRa7StF\nt3p6CwgFcghDL94VCiKR9eAagjbGQU35FOercW4diTJ6tsWtHmyI+ye9upyLqAeP\nCrtForfUAt8BCllov733djNojSEers8lqcW1H79/YoTLDv4EbyHtSph7jiu1XHtg\n3tGJrTcMCScb6sCQ1OC/UHWvihDA7UQDvSJ6jg2hBeOSTAQfqYnKV9/yAR00ynlz\nl0gYlgNiLEeapUcG49k3BkFnCeLt1+m0uwsAb9KxIRUKI1DEAmINu8mTG9d/Hf0M\nAt9H/cQDdUK18Kcm3JEl/yYvhLRf9ET8h3vNsUafoPMpkglEvj51vSKqZv+7e4MG\niDNyQb33AgMBAAECggEABE5n1NqpHdKk3vru9iMsIB6i7j3GqdWU31UlhroOtbbL\n40aH6Ot3EGurgTSOOwfPEKeTJAVVBW78y1RB1koHluTJtGV4gzEbkElBXareu5Sz\n233ViSmfiD1/jCH5yRNXRJsfZ0ancseg9izDIUypoS1wk3kQi9zQK77BgwTeNwmn\nJMYUoItuJr9escyJS5wite1Oiwi0OlFvo3d8bnu8hmyL9jIge+vDqNdf9f2GWHA2\nfhOWx0FC7PdHjAzHEEcAriMSt1x6r1sXxNQvMbeqrIwJPQ7HgDSfGwC2L5O9LOgi\nbKqdm/1TJinO315egvnEJdPU5Z6DmT9L2PWwiNPyeQKBgQDa7LzH/P/QpiniTDvK\nBzjxTFdF/OMqJRrnDSvYUsaT3BEBTQIN5LKnRAHRIqRXaJ/EEtnE92dblc/dPdEV\nY3ixoXAB2BkTpwv+QYuSa73xg8l6q81+YCBOWxQe8KMd0LK7VKwkXDUx7c3F0OEs\nFI7Cm87TiAakTm41ZoWhiK1WiQKBgQDNUKSwH1QKSB+ie4d4ITL81/aJxYwwca12\nebd6+MiHZlr3O9emhSMwgqvZVkhMzxZkrdLNp193A3xGaOAHxABWxGkKYhL91/3u\nMarjTeXGEIaO7V0rPGoqcGRk849AhT21QitdIETIEOc0fD+qolMj3R6ZiA9qGvGH\nsbeLYTFQfwKBgQCT17/9RovzeeNbIaRW4N3Bho6BgzBdq8UpN6neYrgb7kfFmx3C\nCCnl73VSqJRXOx55qUlLTNCN9vPzMuXaDdzaCG29sRPuQ6dDwzvgW8ZgLWGI6DDU\nIVJv1+4UnulpHyE0hQ/jVinOWAvYhSErRY7LObFJBNmHaDfg9CVWWxjEEQKBgESi\nNKt7jYhyW8DhMoQB9R14xD2CAD8hgS8duSwuhjpdCQOkyY4s63qH9BKPOVQT1hSJ\n1vJQhSUv0Rdob5uo9cQLnGGQL3EUBxrdF5csrybq11BoIMEXTRYqxCTLFpQm9l3l\nZMGYy+VlYSS2dEICSXCvtk70oNKDd0I5MnYxY17ZAn9KzFiYgXUri1k2npwdaEu3\nkyjLkgn0v4XJCECfICDwSAaVi95xbe4PcCejMQ1POxloH0uIRXDoBORD9wRmVLXj\nUQV56AABJfKdfwWm+jV6mv1IvLF4uJp9td3pTGbNjFq7HU4bE2S86oJY6jMStR4u\nTJpjBc2IMuzo0L5SoPPp\n-----END PRIVATE KEY-----\n",
+  "client_email": "newseum-service1@newseum-oauth.iam.gserviceaccount.com",
+  "client_id": "100718908242391992472",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/newseum-service1%40newseum-oauth.iam.gserviceaccount.com"
+}
