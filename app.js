@@ -121,8 +121,10 @@ mongoose.Promise = Promise;
 
 //----------------------google text to speech
 
+var credentials = JSON.parse(process.env.GOOGLE_KEY);
+
 // Creates a client
-const client = new textToSpeech.TextToSpeechClient();
+const client = new textToSpeech.TextToSpeechClient({credentials: credentials});
 
 connection.once("open", function() {
   //  statusReport.articledb = {"status" :  "connected"}
