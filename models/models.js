@@ -17,6 +17,7 @@ var PlaylistSchema = new Schema({
     title: String,
     url: String,
     media: String,
+    category: String,
     articles: [Schema.Types.Mixed]
 });
 

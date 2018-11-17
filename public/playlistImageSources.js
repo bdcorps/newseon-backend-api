@@ -20,8 +20,36 @@ var playlistImages = [
   "https://images.unsplash.com/photo-1515857090479-6a2d61847629?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=09241641ea4109d35c17864c3a0b8f2a&auto=format&fit=crop&w=1267&q=80"
 ];
 
-var getMedia = function() {
-  return playlistImages[Math.floor(Math.random() * playlistImages.length)];
-}
+var articleImages = {
+  business: [
+    "https://images.unsplash.com/photo-1521020773588-3b28297b1e70?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=e0973395dd1655ea3b8fb83fa95c02c2&auto=format&fit=crop&w=1469&q=80",
+    "https://images.unsplash.com/photo-1509130298739-651801c76e96?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=b5faa5895582a0b8ae5f7429b59e8488&auto=format&fit=crop&w=1950&q=80"
+  ],
+  technology: [
+    "https://images.unsplash.com/photo-1478432780021-b8d273730d8c?ixlib=rb-0.3.5&s=99f410919a74f2d18945ea7f62c5d4c3&auto=format&fit=crop&w=1350&q=80",
+    "https://images.unsplash.com/photo-1504384764586-bb4cdc1707b0?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=e1dcfcaa6dafa547aa5381b603296c94&auto=format&fit=crop&w=1350&q=80"
+  ],
+  sports: [
+    "https://images.unsplash.com/photo-1521138054413-5a47d349b7af?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=f8cf0ea657ec9f4beb43f2cd6a6d54a6&auto=format&fit=crop&w=676&q=80",
+    "https://images.unsplash.com/photo-1529281322535-245b0a3257ec?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=6425f2048c84111b3c8f92febcaaa2ac&auto=format&fit=crop&w=1350&q=80"
+  ],
+  entertainment: [
+    "https://images.unsplash.com/photo-1527261834078-9b37d35a4a32?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=309fe659f0d0e2a5b7408b7a756613c2&auto=format&fit=crop&w=1950&q=80",
+    "https://images.unsplash.com/photo-1515469826971-68d3550b0110?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=9f3cd3d496e02df256ff3b3aba9d2eee&auto=format&fit=crop&w=634&q=80"
+  ],
+  health: [
+    "https://images.unsplash.com/photo-1503810473512-f64b56827964?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=cb44a21c4469e257a39f30949c81931d&auto=format&fit=crop&w=2134&q=80",
+    "https://images.unsplash.com/photo-1493409137604-0901c55e4456?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=608c673db36723a60ea11d6ffdbc4e48&auto=format&fit=crop&w=1350&q=80"
+  ]
+};
 
-module.exports = {getMedia};
+var getPlaylistSplashMedia = function() {
+  return playlistImages[Math.floor(Math.random() * playlistImages.length)];
+};
+
+var getArticleSplashMedia = function(category) {
+  console.log(category);
+  return articleImages[category][Math.floor(Math.random() * 2)];
+};
+
+module.exports = { getPlaylistSplashMedia, getArticleSplashMedia };

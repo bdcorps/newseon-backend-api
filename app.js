@@ -279,11 +279,13 @@ connection.once("open", function() {
       playlistsData.id = random;
       if (query.category != null) {
         playlistsData.title = title + " about " + captilizeWord(query.category);
+        playlistsData.category = query.category;
       } else if (query.q != null) {
         playlistsData.title = title + " about " + captilizeWord(query.q);
+        playlistsData.category = query.q;
       }
       playlistsData.url = playlistURL;
-      playlistsData.media = playlistImagesSources.getMedia();
+      playlistsData.media = playlistImagesSources.getPlaylistSplashMedia();
       playlistsData.articles = [];
       playlistIDs.push({
         id: playlistsData.id,
@@ -293,7 +295,8 @@ connection.once("open", function() {
 
       dataToSaveToFile.playlists.push({
         id: playlistsData.id,
-        url: playlistsData.url
+        url: playlistsData.url,
+        category: playlistsData.category
       });
       saveToFile(dataToSaveToFile);
 
@@ -307,6 +310,7 @@ connection.once("open", function() {
         title: playlistsData.title,
         url: playlistsData.url,
         media: playlistsData.media,
+        category: playlistsData.category,
         articles: playlistsData.articles
       });
 
@@ -349,7 +353,7 @@ connection.once("open", function() {
   }
 
   app.get("/", (req, res) => {
-    res.send("API Version 0.2");
+    res.send("API Version 0.2.1");
   });
 
   /**
@@ -415,7 +419,9 @@ connection.once("open", function() {
               .update(articles[j].title)
               .digest("hex");
 
-            initAudioTracks(req, res, articles[j], hash, playlists[i].id,j);
+console.log("its " + JSON.stringify(playlists[i]));
+
+            initAudioTracks(req, res, articles[j], hash, playlists[i].id,j,playlists[i].category);
 
             articleIDs.push(hash);
 
@@ -434,9 +440,9 @@ connection.once("open", function() {
 const snooze = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 // Slowing down the calls to Google Text to Speech
-const initAudioTracks = async (req, res, article, hash, playlistID, articleOrder) => {
+const initAudioTracks = async (req, res, article, hash, playlistID, articleOrder, category) => {
   await snooze(2000);
-  generateAudioTrack(req, res, article, hash, playlistID, articleOrder);
+  generateAudioTrack(req, res, article, hash, playlistID, articleOrder, category);
 };
 
 const storage = multer.memoryStorage();
@@ -445,7 +451,10 @@ const upload = multer({
   limits: { fields: 1, fileSize: 6000000, files: 1, parts: 2 }
 });
 
-function generateAudioTrack(req, res, article, hash, playlistID, articleOrder) {
+function generateAudioTrack(req, res, article, hash, playlistID, articleOrder, category) {
+
+  var cleanedAbstract = article.description !=null ? article.description : article.title;
+
   const audioRequest = {
     input: { text: article.description !=null ? article.description : article.title },
     // Select the language and SSML Voice Gender (optional)
@@ -481,7 +490,7 @@ function generateAudioTrack(req, res, article, hash, playlistID, articleOrder) {
           if (err) {
             console.log("error: " + err);
           }
-          uploadTrack(article, hash, playlistID, articleOrder);
+          uploadTrack(article, hash, playlistID, articleOrder, category);
         });
       }
     );
@@ -489,7 +498,7 @@ function generateAudioTrack(req, res, article, hash, playlistID, articleOrder) {
 }
 
 // Uploads the audio track of the news article to db
-function uploadTrack(article, hash, playlistID, articleOrder) {
+function uploadTrack(article, hash, playlistID, articleOrder, category) {
   var readableTrackStream = fs.createReadStream(__dirname + "/uploads/" + hash);
 
   let bucket = new mongodb.GridFSBucket(db, {
@@ -515,7 +524,7 @@ function uploadTrack(article, hash, playlistID, articleOrder) {
       abstract: (article.description != null) ? article.description : article.title, 
       publisher: article.source.name,
       // media: article.urlToImage,
-      media: (article.urlToImage != null) ? article.urlToImage  : "https://via.placeholder.com/350x350",
+      media: (article.urlToImage != null) ? article.urlToImage  : playlistImagesSources.getArticleSplashMedia(category),
       publishedOn: new Date(article.publishedAt),
       audioTrackID: id,
       url: article.url
